@@ -12,5 +12,6 @@ router.get("/", (req, res) => {
     });
 });
 router.post("/getUser", crud_1.getUser);
-router.post("/createUser", crud_1.createUser);
+router.post("/signupUser", crud_1.signupHandler);
+router.post("/loginUser", crud_1.loginHandler);
 exports.default = router;

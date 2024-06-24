@@ -4,4 +4,5 @@ export const messages = {
   userFound: "User with this email is already present",
   fillDetails: "Please provide all the details",
   userCreated: "User successfully SignedUp!",
+  invalidInput: "Invalid inputs",
 };

@@ -8,26 +8,39 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createUser = exports.getUser = void 0;
+exports.loginHandler = exports.signupHandler = exports.getUser = void 0;
 const client_1 = require("@prisma/client");
 const message_1 = require("../message");
-const prisma = new client_1.PrismaClient();
+const zod_1 = require("./zod");
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+let saltRounds = 7;
 function getUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const user = req.body;
-            const result = yield isUserFound(user.username);
-            if (result) {
-                res.status(200).json({
-                    //Sending false because user with requested emailId is not found
-                    message: false,
-                });
+            const { success } = zod_1.zodUsername.safeParse(user.username);
+            if (success) {
+                const prisma = new client_1.PrismaClient();
+                const result = yield isUserFound(user.username, prisma);
+                if (result) {
+                    res.status(200).json({
+                        //Sending false because user with requested emailId is not found
+                        message: false,
+                    });
+                }
+                else {
+                    res.status(200).json({
+                        message: message_1.messages.userFound,
+                    });
+                }
             }
             else {
-                res.status(200).json({
-                    message: message_1.messages.userFound,
-                });
+                failureMessage(res, message_1.messages.invalidInput);
             }
         }
         catch (e) {
@@ -36,37 +49,91 @@ function getUser(req, res) {
     });
 }
 exports.getUser = getUser;
-function createUser(req, res) {
+function signupHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (yield isUserFound(req.body.username)) {
-            const user = req.body;
-            if (user.username == "" || user.password == "" || user.fullname == "") {
+        const user = req.body;
+        const { success } = zod_1.zodUser.safeParse(user);
+        if (!success) {
+            res.status(200).json({
+                message: message_1.messages.invalidInput,
+            });
+            return;
+        }
+        try {
+            const prisma = new client_1.PrismaClient();
+            if (yield isUserFound(req.body.username, prisma)) {
+                let promise = new Promise((res) => {
+                    bcrypt_1.default.hash(user.password, saltRounds, (err, response) => {
+                        if (err)
+                            throw new Error();
+                        user.password = response;
+                        res("");
+                    });
+                });
+                yield promise;
+                const result = yield prisma.user.create({
+                    data: user,
+                });
                 res.status(200).json({
-                    message: message_1.messages.fillDetails,
+                    message: message_1.messages.userCreated,
                 });
             }
             else {
-                try {
-                    const result = yield prisma.user.create({
-                        data: user,
-                    });
-                    console.log(result);
-                    res.status(200).json({
-                        message: message_1.messages.userCreated,
-                    });
-                }
-                catch (e) {
-                    failureMessage(res, message_1.messages.failure);
-                }
+                failureMessage(res, message_1.messages.userFound);
             }
         }
-        else {
-            failureMessage(res, message_1.messages.userFound);
+        catch (e) {
+            failureMessage(res, message_1.messages.failure);
         }
     });
 }
-exports.createUser = createUser;
-function isUserFound(username) {
+exports.signupHandler = signupHandler;
+function loginHandler(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const body = req.body;
+        const { success } = zod_1.zodLogin.safeParse(body);
+        let key = process.env.JWT_SECRET_KEY || null;
+        if (!success) {
+            failureMessage(res, message_1.messages.invalidInput);
+            return;
+        }
+        try {
+            const prisma = new client_1.PrismaClient();
+            let isCorrect;
+            const user = yield prisma.user.findUnique({
+                where: {
+                    username: body.username,
+                },
+                select: {
+                    username: true,
+                    password: true,
+                },
+            });
+            if (user != null) {
+                isCorrect = yield bcrypt_1.default.compare(body.password, user.password);
+                if (isCorrect && process.env.JWT_SECRET_KEY) {
+                    let token = jsonwebtoken_1.default.sign({ username: user.username }, process.env.JWT_SECRET_KEY);
+                    res.status(200).json({
+                        message: token,
+                    });
+                }
+                else {
+                    res.status(200).json({
+                        message: false,
+                    });
+                }
+            }
+            else {
+                throw new Error("");
+            }
+        }
+        catch (e) {
+            failureMessage(res, message_1.messages.failure);
+        }
+    });
+}
+exports.loginHandler = loginHandler;
+function isUserFound(username, prisma) {
     return __awaiter(this, void 0, void 0, function* () {
         const result = yield prisma.user.findUnique({
             where: {

@@ -1,5 +1,5 @@
 import express from "express";
-import { createUser, getUser } from "./crud";
+import { getUser, loginHandler, signupHandler } from "./crud";
 
 const router = express.Router();
 
@@ -10,6 +10,7 @@ router.get("/", (req, res) => {
 });
 
 router.post("/getUser", getUser);
-router.post("/createUser", createUser);
+router.post("/signupUser", signupHandler);
+router.post("/loginUser", loginHandler);
 
 export default router;
