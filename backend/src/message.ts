@@ -5,4 +5,5 @@ export const messages = {
   fillDetails: "Please provide all the details",
   userCreated: "User successfully SignedUp!",
   invalidInput: "Invalid inputs",
+  unauth: "Unauthorized access",
 };

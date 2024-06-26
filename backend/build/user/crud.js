@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loginHandler = exports.signupHandler = exports.getUser = void 0;
+exports.failureMessage = exports.isUserFound = exports.loginHandler = exports.signupHandler = exports.getUser = void 0;
 const client_1 = require("@prisma/client");
 const message_1 = require("../message");
 const zod_1 = require("./zod");
@@ -139,12 +139,17 @@ function isUserFound(username, prisma) {
             where: {
                 username: username,
             },
+            select: {
+                username: true,
+            },
         });
         return result === null;
     });
 }
+exports.isUserFound = isUserFound;
 function failureMessage(res, msg) {
     res.status(500).json({
         message: msg,
     });
 }
+exports.failureMessage = failureMessage;

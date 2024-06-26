@@ -14,9 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const route_1 = __importDefault(require("./user/route"));
+const route_2 = __importDefault(require("./task/route"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use("/user", route_1.default);
+app.use("/task", route_2.default);
 app.listen(3001, () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Server started at 3000");
 }));

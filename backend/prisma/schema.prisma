@@ -18,4 +18,22 @@ model User {
   username  String      @unique
   password  String
   fullname  String
+  tasks     Task[]
+}
+
+model Task {
+  id          Int         @id @default(autoincrement()) 
+  title       String
+  description String
+  type        TYPES
+  user        User        @relation(fields:[username], references: [username])
+  username    String         
+  createdAt   DateTime    @default(now())
+  dueDate     DateTime?
+}
+
+enum TYPES {
+  TODO
+  IN_PROGRESS
+  DONE
 }

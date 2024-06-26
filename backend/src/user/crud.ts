@@ -110,16 +110,19 @@ export async function loginHandler(req: Request, res: Response) {
   }
 }
 
-async function isUserFound(username: string, prisma: PrismaClient) {
+export async function isUserFound(username: string, prisma: PrismaClient) {
   const result = await prisma.user.findUnique({
     where: {
       username: username,
+    },
+    select: {
+      username: true,
     },
   });
   return result === null;
 }
 
-function failureMessage(res: Response, msg: string) {
+export function failureMessage(res: Response, msg: string) {
   res.status(500).json({
     message: msg,
   });
