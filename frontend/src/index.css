@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #eef5ff;
+}
+
+@keyframes loaderPoint {
+  0% {
+    transform: translateX(-15vw);
+  }
+  100% {
+    transform: translateX(15vw);
+  }
+}
+.loaderPoint {
+  animation: loaderPoint 1.5s linear infinite;
+}
+
+@keyframes toastAnimation {
+  0% {
+    right: -20%;
+  }
+  10% {
+    right: 2%;
+  }
+  90% {
+    right: 2%;
+  }
+  100% {
+    right: -20%;
+  }
+}
