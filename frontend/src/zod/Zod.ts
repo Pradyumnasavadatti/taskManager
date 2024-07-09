@@ -33,4 +33,5 @@ export interface SimpleTaskModal {
   description: string;
   type: string;
   dueDate: string;
+  createdAt: string;
 }

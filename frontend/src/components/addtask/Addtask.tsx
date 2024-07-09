@@ -2,13 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import Button from "../Button";
 import Input from "../Input";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { SimpleTaskModal, taskModel } from "../../zod/Zod";
+import { taskModel } from "../../zod/Zod";
 import { errorAtom } from "../../store/Error";
 import axios from "axios";
 import { backend_url, local_storage_token_key } from "../../config/creds";
 import { tasksAtom } from "../../store/Tasks";
 import { loadAtom } from "../../store/Load";
 import { toastAtom } from "../../store/Toast";
+import { unfilteredTasks } from "../../store/UnfilteredTasks";
+import { useDoFilter } from "../home/container/Filter";
 
 function Addtask() {
   type TaskModel = {
@@ -29,8 +31,10 @@ function Addtask() {
   });
   const setError = useSetRecoilState(errorAtom);
   const setLoader = useSetRecoilState(loadAtom);
-  const [taskAtom, setTaskAtom] = useRecoilState(tasksAtom);
+  const [taskAtom, setTaskAtom] = useRecoilState(unfilteredTasks);
+  const setFilteredTaskAtom = useSetRecoilState(tasksAtom);
   const setToast = useSetRecoilState(toastAtom);
+  const doFilterFn = useDoFilter();
 
   async function handleSubmit() {
     const taskData: TaskModel = {
@@ -69,10 +73,9 @@ function Addtask() {
         const newTaskArr: any = [];
         newTaskArr.push(...taskAtom);
         newTaskArr.push(newTask);
-        console.log(taskAtom);
-        console.log(newTask);
-        console.log(newTaskArr);
         setTaskAtom(newTaskArr);
+        const filteredArr = doFilterFn();
+        setFilteredTaskAtom(filteredArr);
         if (
           titleRef.current &&
           descRef.current &&
@@ -84,15 +87,15 @@ function Addtask() {
           typeRef.current.value = "";
           dueDateRef.current.value = "";
         }
-        setToast("Task added successfully!");
+        setToast("Task added!");
         setLoader(false);
       }, 1000);
       return () => clearTimeout(timer);
     }
   }, [task]);
   return (
-    <div className="w-[100vw] h-[100vh] flex justify-center items-center flex-col bg-app-theme-100">
-      <div className="w-[50%] h-[80%] text-app-theme-400 flex flex-col justify-evenly items-start">
+    <div className="col-span-4 h-[100vh] flex justify-center items-center flex-col bg-app-theme-100">
+      <div className="w-[70%] h-[80%] text-app-theme-400 flex flex-col justify-evenly items-start">
         <div className="flex flex-col justify-start items-start w-full p-2">
           <Input fieldName="Title" max={100} ref={titleRef} />
           <span className="text-sm text-gray-500">

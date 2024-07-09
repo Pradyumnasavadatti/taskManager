@@ -8,7 +8,7 @@ function Container() {
   const tasks: SimpleTaskModal[] = useRecoilValue(tasksAtom);
   return (
     <div className="flex flex-col justify-evenly items-start overflow-hidden col-span-4 h-full p-2">
-      <h1 className="text-4xl text-app-theme-400">All tasks</h1>
+      <h1 className="text-4xl text-app-theme-400">Task List</h1>
       <div className="w-full h-[0.3vh] bg-app-theme-400"></div>
       <Filter />
       <div className="w-full h-[75%] overflow-hidden">
@@ -26,6 +26,9 @@ function Container() {
                       id={task.id}
                       dueDate={
                         new Date(task.dueDate).toLocaleString().split(",")[0]
+                      }
+                      createdAt={
+                        new Date(task.createdAt).toLocaleString().split(",")[0]
                       }
                     />
                   </>

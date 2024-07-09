@@ -4,25 +4,33 @@ import Addtask from "../addtask/Addtask";
 import Container from "./container/Container";
 import { backend_url, local_storage_token_key } from "../../config/creds";
 import { useEffect } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { tasksAtom } from "../../store/Tasks";
 import axios from "axios";
+import { unfilteredTasks } from "../../store/UnfilteredTasks";
+import { useDoFilter } from "./container/Filter";
 
 function Home() {
   const url = useLocation();
   const [tasks, setTasks] = useRecoilState(tasksAtom);
+  const [unfilteredTask, setUnfilteredTasks] = useRecoilState(unfilteredTasks);
+  const filter = useDoFilter();
   useEffect(() => {
     const fetch = async () => {
       const headers = { auth: localStorage.getItem(local_storage_token_key) };
       const response = await axios.get(backend_url + "task/getTasks", {
         headers,
       });
-      setTasks(response.data.message.tasks);
+      setUnfilteredTasks(response.data.message.tasks);
     };
     if (tasks.length == 0) {
       fetch();
     }
   }, []);
+  useEffect(() => {
+    let filteredTasks = filter();
+    setTasks(filteredTasks);
+  }, [unfilteredTask]);
 
   if (url.pathname == "/addTask") {
     return (

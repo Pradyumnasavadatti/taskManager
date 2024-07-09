@@ -8,8 +8,9 @@ import Error from "./components/modal/Error.tsx";
 import Signup from "./components/auth/Signup.tsx";
 import Home from "./components/home/Home.tsx";
 import Load from "./components/loader/Load.tsx";
-import Addtask from "./components/addtask/Addtask.tsx";
 import Toast from "./components/modal/Toast.tsx";
+import Details from "./components/home/container/details/Details.tsx";
+import Update from "./components/home/container/update/Update.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <RecoilRoot>
@@ -25,7 +26,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       </Routes>
     </BrowserRouter>
     <Error />
-    <Toast>No</Toast>
+    <Details />
+    <Update />
+    <Toast />
     <Load />
   </RecoilRoot>
 );
