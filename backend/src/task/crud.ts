@@ -2,11 +2,10 @@ import { Request, Response } from "express";
 import { failureMessage } from "../user/crud";
 import { messages } from "../message";
 import { PrismaClient, Task } from "@prisma/client";
-
+const prisma = new PrismaClient();
 export async function getTasks(req: Request, res: Response) {
   try {
     const username = getUsername(req);
-    const prisma = req.body.prisma;
     const tasks = await prisma.user.findUnique({
       where: {
         username: username,
@@ -26,7 +25,6 @@ export async function getTasks(req: Request, res: Response) {
 export async function addTask(req: Request, res: Response) {
   try {
     const username = getUsername(req);
-    const prisma = req.body.prisma;
     const task = req.body.task;
     const response = await prisma.task.create({
       data: {
@@ -39,7 +37,9 @@ export async function addTask(req: Request, res: Response) {
     });
     console.log(response);
     res.status(200).json({
-      message: true,
+      message: {
+        id: response.id,
+      },
     });
   } catch (e) {
     console.log(e);
@@ -50,7 +50,6 @@ export async function addTask(req: Request, res: Response) {
 export async function updateTodo(req: Request, res: Response) {
   try {
     const username = getUsername(req);
-    const prisma = req.body.prisma;
     const task = req.body.task;
     const response = await prisma.task.update({
       where: {
@@ -77,7 +76,6 @@ export async function updateTodo(req: Request, res: Response) {
 export async function deleteTodo(req: Request, res: Response) {
   try {
     const task: Task = req.body.task;
-    const prisma = req.body.prisma;
     const response = await prisma.task.delete({
       where: {
         id: task.id,
@@ -96,7 +94,6 @@ export async function deleteTodo(req: Request, res: Response) {
 export async function deleteAccount(req: Request, res: Response) {
   try {
     const username = getUsername(req);
-    const prisma = req.body.prisma;
     const response1 = await prisma.task.deleteMany({
       where: {
         username,

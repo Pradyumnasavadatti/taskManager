@@ -12,11 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteAccount = exports.deleteTodo = exports.updateTodo = exports.addTask = exports.getTasks = void 0;
 const crud_1 = require("../user/crud");
 const message_1 = require("../message");
+const client_1 = require("@prisma/client");
+const prisma = new client_1.PrismaClient();
 function getTasks(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const username = getUsername(req);
-            const prisma = req.body.prisma;
             const tasks = yield prisma.user.findUnique({
                 where: {
                     username: username,
@@ -39,7 +40,6 @@ function addTask(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const username = getUsername(req);
-            const prisma = req.body.prisma;
             const task = req.body.task;
             const response = yield prisma.task.create({
                 data: {
@@ -52,7 +52,9 @@ function addTask(req, res) {
             });
             console.log(response);
             res.status(200).json({
-                message: true,
+                message: {
+                    id: response.id,
+                },
             });
         }
         catch (e) {
@@ -66,7 +68,6 @@ function updateTodo(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const username = getUsername(req);
-            const prisma = req.body.prisma;
             const task = req.body.task;
             const response = yield prisma.task.update({
                 where: {
@@ -96,7 +97,6 @@ function deleteTodo(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const task = req.body.task;
-            const prisma = req.body.prisma;
             const response = yield prisma.task.delete({
                 where: {
                     id: task.id,
@@ -118,7 +118,6 @@ function deleteAccount(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const username = getUsername(req);
-            const prisma = req.body.prisma;
             const response1 = yield prisma.task.deleteMany({
                 where: {
                     username,

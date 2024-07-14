@@ -6,14 +6,13 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 let saltRounds = 7;
-
+const prisma = new PrismaClient();
 export async function getUser(req: Request, res: Response) {
   try {
     const user = req.body;
     const { success } = zodUsername.safeParse(user.username);
     if (success) {
-      const prisma = new PrismaClient();
-      const result = await isUserFound(user.username, prisma);
+      const result = await isUserFound(user.username);
       if (result) {
         res.status(200).json({
           //Sending false because user with requested emailId is not found
@@ -36,14 +35,13 @@ export async function signupHandler(req: Request, res: Response) {
   const user = req.body;
   const { success } = zodUser.safeParse(user);
   if (!success) {
-    res.status(200).json({
+    res.status(411).json({
       message: messages.invalidInput,
     });
     return;
   }
   try {
-    const prisma = new PrismaClient();
-    if (await isUserFound(req.body.username, prisma)) {
+    if (await isUserFound(req.body.username)) {
       let promise = new Promise((res) => {
         bcrypt.hash(user.password, saltRounds, (err, response) => {
           if (err) throw new Error();
@@ -52,14 +50,24 @@ export async function signupHandler(req: Request, res: Response) {
         });
       });
       await promise;
-      const result = await prisma.user.create({
+      await prisma.user.create({
         data: user,
       });
-      res.status(200).json({
-        message: messages.userCreated,
-      });
+      if (process.env.JWT_SECRET_KEY) {
+        let token = jwt.sign(
+          {
+            username: user.username,
+          },
+          process.env.JWT_SECRET_KEY
+        );
+        res.status(200).json({
+          message: token,
+        });
+      }
     } else {
-      failureMessage(res, messages.userFound);
+      res.status(411).json({
+        message: messages.userFound,
+      });
     }
   } catch (e) {
     failureMessage(res, messages.failure);
@@ -68,15 +76,15 @@ export async function signupHandler(req: Request, res: Response) {
 
 export async function loginHandler(req: Request, res: Response) {
   const body = req.body;
-  const { success } = zodLogin.safeParse(body);
-  let key = process.env.JWT_SECRET_KEY || null;
+  const { success, error } = zodLogin.safeParse(body);
   if (!success) {
-    failureMessage(res, messages.invalidInput);
+    res.status(411).json({
+      message: messages.invalidInput,
+    });
     return;
   }
 
   try {
-    const prisma = new PrismaClient();
     let isCorrect;
     const user = await prisma.user.findUnique({
       where: {
@@ -91,26 +99,31 @@ export async function loginHandler(req: Request, res: Response) {
       isCorrect = await bcrypt.compare(body.password, user.password);
       if (isCorrect && process.env.JWT_SECRET_KEY) {
         let token = jwt.sign(
-          { username: user.username },
+          {
+            username: user.username,
+          },
           process.env.JWT_SECRET_KEY
         );
         res.status(200).json({
           message: token,
         });
       } else {
-        res.status(200).json({
-          message: false,
+        res.status(411).json({
+          message: messages.invalidInput,
         });
       }
     } else {
-      throw new Error("");
+      res.status(411).json({
+        message: messages.invalidInput,
+      });
     }
   } catch (e) {
+    console.log(e);
     failureMessage(res, messages.failure);
   }
 }
 
-export async function isUserFound(username: string, prisma: PrismaClient) {
+export async function isUserFound(username: string) {
   const result = await prisma.user.findUnique({
     where: {
       username: username,

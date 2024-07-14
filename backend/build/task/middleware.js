@@ -16,7 +16,6 @@ exports.authMiddleware = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const crud_1 = require("../user/crud");
 const message_1 = require("../message");
-const client_1 = require("@prisma/client");
 function authMiddleware(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -24,12 +23,11 @@ function authMiddleware(req, res, next) {
                 throw new Error("");
             }
             let authToken = req.headers["auth"];
+            console.log(req.headers);
             if (authToken) {
-                const prisma = new client_1.PrismaClient();
                 const decode = jsonwebtoken_1.default.verify(authToken, process.env.JWT_SECRET_KEY);
                 req.body.decode = decode;
-                req.body.prisma = prisma;
-                if (yield (0, crud_1.isUserFound)(decode.username, prisma)) {
+                if (yield (0, crud_1.isUserFound)(decode.username)) {
                     return res.status(411).json({
                         message: "Unauthorized access!",
                     });

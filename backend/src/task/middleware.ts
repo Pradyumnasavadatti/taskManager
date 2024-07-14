@@ -14,11 +14,9 @@ export async function authMiddleware(
     }
     let authToken = req.headers["auth"] as string;
     if (authToken) {
-      const prisma = new PrismaClient();
       const decode: any = jwt.verify(authToken, process.env.JWT_SECRET_KEY);
       req.body.decode = decode;
-      req.body.prisma = prisma;
-      if (await isUserFound(decode.username, prisma)) {
+      if (await isUserFound(decode.username)) {
         return res.status(411).json({
           message: "Unauthorized access!",
         });

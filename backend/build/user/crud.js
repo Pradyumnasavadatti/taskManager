@@ -19,14 +19,14 @@ const zod_1 = require("./zod");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 let saltRounds = 7;
+const prisma = new client_1.PrismaClient();
 function getUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const user = req.body;
             const { success } = zod_1.zodUsername.safeParse(user.username);
             if (success) {
-                const prisma = new client_1.PrismaClient();
-                const result = yield isUserFound(user.username, prisma);
+                const result = yield isUserFound(user.username);
                 if (result) {
                     res.status(200).json({
                         //Sending false because user with requested emailId is not found
@@ -54,14 +54,13 @@ function signupHandler(req, res) {
         const user = req.body;
         const { success } = zod_1.zodUser.safeParse(user);
         if (!success) {
-            res.status(200).json({
+            res.status(411).json({
                 message: message_1.messages.invalidInput,
             });
             return;
         }
         try {
-            const prisma = new client_1.PrismaClient();
-            if (yield isUserFound(req.body.username, prisma)) {
+            if (yield isUserFound(req.body.username)) {
                 let promise = new Promise((res) => {
                     bcrypt_1.default.hash(user.password, saltRounds, (err, response) => {
                         if (err)
@@ -71,15 +70,22 @@ function signupHandler(req, res) {
                     });
                 });
                 yield promise;
-                const result = yield prisma.user.create({
+                yield prisma.user.create({
                     data: user,
                 });
-                res.status(200).json({
-                    message: message_1.messages.userCreated,
-                });
+                if (process.env.JWT_SECRET_KEY) {
+                    let token = jsonwebtoken_1.default.sign({
+                        username: user.username,
+                    }, process.env.JWT_SECRET_KEY);
+                    res.status(200).json({
+                        message: token,
+                    });
+                }
             }
             else {
-                failureMessage(res, message_1.messages.userFound);
+                res.status(411).json({
+                    message: message_1.messages.userFound,
+                });
             }
         }
         catch (e) {
@@ -91,14 +97,14 @@ exports.signupHandler = signupHandler;
 function loginHandler(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const body = req.body;
-        const { success } = zod_1.zodLogin.safeParse(body);
-        let key = process.env.JWT_SECRET_KEY || null;
+        const { success, error } = zod_1.zodLogin.safeParse(body);
         if (!success) {
-            failureMessage(res, message_1.messages.invalidInput);
+            res.status(411).json({
+                message: message_1.messages.invalidInput,
+            });
             return;
         }
         try {
-            const prisma = new client_1.PrismaClient();
             let isCorrect;
             const user = yield prisma.user.findUnique({
                 where: {
@@ -112,28 +118,33 @@ function loginHandler(req, res) {
             if (user != null) {
                 isCorrect = yield bcrypt_1.default.compare(body.password, user.password);
                 if (isCorrect && process.env.JWT_SECRET_KEY) {
-                    let token = jsonwebtoken_1.default.sign({ username: user.username }, process.env.JWT_SECRET_KEY);
+                    let token = jsonwebtoken_1.default.sign({
+                        username: user.username,
+                    }, process.env.JWT_SECRET_KEY);
                     res.status(200).json({
                         message: token,
                     });
                 }
                 else {
-                    res.status(200).json({
-                        message: false,
+                    res.status(411).json({
+                        message: message_1.messages.invalidInput,
                     });
                 }
             }
             else {
-                throw new Error("");
+                res.status(411).json({
+                    message: message_1.messages.invalidInput,
+                });
             }
         }
         catch (e) {
+            console.log(e);
             failureMessage(res, message_1.messages.failure);
         }
     });
 }
 exports.loginHandler = loginHandler;
-function isUserFound(username, prisma) {
+function isUserFound(username) {
     return __awaiter(this, void 0, void 0, function* () {
         const result = yield prisma.user.findUnique({
             where: {

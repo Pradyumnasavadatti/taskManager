@@ -1,8 +1,9 @@
 import express from "express";
 import router from "./user/route";
 import taskRouter from "./task/route";
-import { PrismaClient } from "@prisma/client";
+import cors from "cors";
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use("/user", router);
 app.use("/task", taskRouter);
