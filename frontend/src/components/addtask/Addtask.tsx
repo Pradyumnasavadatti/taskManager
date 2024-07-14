@@ -109,7 +109,7 @@ function Addtask() {
             rows={5}
             maxLength={250}
             defaultValue=""
-            className="p-2 outline-none text-xl w-full"
+            className="p-2 outline-none text-xl w-full resize-none"
             ref={descRef}
             placeholder={"Enter Description"}
           ></textarea>

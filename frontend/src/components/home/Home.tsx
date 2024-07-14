@@ -9,6 +9,7 @@ import { tasksAtom } from "../../store/Tasks";
 import axios from "axios";
 import { unfilteredTasks } from "../../store/UnfilteredTasks";
 import { useDoFilter } from "./container/Filter";
+import Kanban from "../kanban/Kanban";
 
 function Home() {
   const url = useLocation();
@@ -37,6 +38,15 @@ function Home() {
       <div className="w-[100vw] h-[100vh] grid grid-cols-5 bg-app-theme-100">
         <Nav />
         <Addtask />
+      </div>
+    );
+  }
+
+  if (url.pathname == "/kanban") {
+    return (
+      <div className="w-[100vw] h-[100vh] grid grid-cols-5 bg-app-theme-100">
+        <Nav />
+        <Kanban />
       </div>
     );
   }

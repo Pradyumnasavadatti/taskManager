@@ -3,7 +3,7 @@ import Card from "./Card";
 import { useRecoilValue } from "recoil";
 import { tasksAtom } from "../../../store/Tasks";
 import { SimpleTaskModal } from "../../../zod/Zod";
-
+import NoTodo from "../../../assets/noTodo.png";
 function Container() {
   const tasks: SimpleTaskModal[] = useRecoilValue(tasksAtom);
   return (
@@ -15,7 +15,7 @@ function Container() {
         <div className="w-full h-full overflow-scroll ">
           {tasks.length != 0 && (
             <div className="w-full min-h-fit flex flex-wrap justify-start items-center">
-              {tasks.map((task) => {
+              {tasks.map((task, index) => {
                 return (
                   <>
                     <Card
@@ -30,6 +30,7 @@ function Container() {
                       createdAt={
                         new Date(task.createdAt).toLocaleString().split(",")[0]
                       }
+                      index={index}
                     />
                   </>
                 );
@@ -37,7 +38,14 @@ function Container() {
             </div>
           )}
           {tasks.length == 0 && (
-            <h1 className="text-gray-500 text-2xl">No tasks added yet!</h1>
+            <div className="w-full h-full flex flex-col justify-start items-center">
+              <img
+                src={NoTodo}
+                alt="Loading..."
+                className="w-[25vmax] h-[25vmax]"
+              />
+              <h1 className="text-gray-500 text-2xl">No tasks added yet!</h1>
+            </div>
           )}
         </div>
       </div>

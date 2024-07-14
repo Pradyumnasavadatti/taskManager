@@ -88,10 +88,16 @@ export const useDoFilter = () => {
           taskDate.getMonth(),
           taskDate.getFullYear(),
         ];
-        for (let i = 0; i < today.length; i++) {
-          if (today[i] > taskDateArr[i]) {
-            return true;
-          }
+        if (taskDateArr[2] < today[2]) {
+          return true;
+        } else if (taskDateArr[1] < today[1] && taskDateArr[2] == today[2]) {
+          return true;
+        } else if (
+          taskDateArr[0] < today[0] &&
+          taskDateArr[1] == today[1] &&
+          taskDateArr[2] == today[2]
+        ) {
+          return true;
         }
         return false;
       });

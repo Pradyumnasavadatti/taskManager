@@ -27,6 +27,21 @@ export const taskModel = z.object({
   dueDate: z.date({ message: "Invalid date format" }),
 });
 
+export const taskModelWithDateString = z.object({
+  title: z
+    .string()
+    .min(2, { message: "Title must be minimum of 2 chars" })
+    .max(50, { message: "Title must be lesser than 50 chars" }),
+  description: z
+    .string()
+    .min(10, { message: "Description must be minimum of 10 chars" })
+    .max(250, { message: "Description must be lesser than 250 chars" }),
+  type: z.enum(["TODO", "IN_PROGRESS", "DONE"], {
+    message: "Invalid value for type of the task",
+  }),
+  dueDate: z.string({ message: "Due date is required" }),
+});
+
 export interface SimpleTaskModal {
   id: Number;
   title: string;

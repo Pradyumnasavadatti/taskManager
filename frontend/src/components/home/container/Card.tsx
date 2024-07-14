@@ -19,6 +19,7 @@ function Card({
   dueDate,
   id,
   createdAt,
+  index,
 }: {
   type: string;
   title: string;
@@ -26,6 +27,7 @@ function Card({
   dueDate: string;
   id: Number;
   createdAt: string;
+  index: number;
 }) {
   let typeColor;
   const [deleteClicked, setDeleteClicked] = useState(false);
@@ -92,7 +94,7 @@ function Card({
     });
   }
   function editHandler() {
-    setUpdate(true);
+    setUpdate(index);
   }
 
   return (
@@ -114,12 +116,14 @@ function Card({
             title="Enlarge"
             onClick={openDetailsHandler}
           />
-          <img
-            src={EditIcon}
-            className="w-[2vmax] h-[2vmax]  ml-2 hover:scale-110 transition-all"
-            title="Edit"
-            onClick={editHandler}
-          />
+          {type != "DONE" && (
+            <img
+              src={EditIcon}
+              className="w-[2vmax] h-[2vmax]  ml-2 hover:scale-110 transition-all"
+              title="Edit"
+              onClick={editHandler}
+            />
+          )}
           <img
             src={DeleteIcon}
             className="w-[2vmax] h-[2vmax] ml-2  hover:scale-110  transition-all"
@@ -136,7 +140,14 @@ function Card({
           ? description.slice(0, 25) + "..."
           : description}
       </div>
-      <div className="w-full p-1 text-sm">Due by:{" " + dueDate}</div>
+      {type == "DONE" && (
+        <div className="w-full p-1 text-sm line-through">
+          Due by:{" " + dueDate}
+        </div>
+      )}
+      {type != "DONE" && (
+        <div className="w-full p-1 text-sm">Due by:{" " + dueDate}</div>
+      )}
     </div>
   );
 }
