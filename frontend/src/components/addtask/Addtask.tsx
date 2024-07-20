@@ -74,6 +74,7 @@ function Addtask() {
         newTaskArr.push(...taskAtom);
         newTaskArr.push(newTask);
         setTaskAtom(newTaskArr);
+
         const filteredArr = doFilterFn();
         setFilteredTaskAtom(filteredArr);
         if (

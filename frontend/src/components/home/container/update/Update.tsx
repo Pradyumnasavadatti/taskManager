@@ -1,4 +1,4 @@
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import CloseIcon from "../../../../assets/close.png";
 import { updateAtom } from "../../../../store/Update";
 import { useEffect, useState } from "react";

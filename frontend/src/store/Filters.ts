@@ -9,3 +9,8 @@ export const byType = atom({
   key: "byTypeFilter",
   default: "ALL",
 });
+
+export const searchKey = atom({
+  key: "searchKeyAtom",
+  default: "",
+});

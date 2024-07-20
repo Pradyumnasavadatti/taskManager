@@ -14,7 +14,10 @@ function Container() {
       <div className="w-full h-[75%] overflow-hidden">
         <div className="w-full h-full overflow-scroll ">
           {tasks.length != 0 && (
-            <div className="w-full min-h-fit flex flex-wrap justify-start items-center">
+            <div
+              key="tasksContainer"
+              className="w-full min-h-fit flex flex-wrap justify-start items-center"
+            >
               {tasks.map((task, index) => {
                 return (
                   <>
@@ -38,7 +41,10 @@ function Container() {
             </div>
           )}
           {tasks.length == 0 && (
-            <div className="w-full h-full flex flex-col justify-start items-center">
+            <div
+              key="noTasksContainer"
+              className="w-full h-full flex flex-col justify-start items-center"
+            >
               <img
                 src={NoTodo}
                 alt="Loading..."
