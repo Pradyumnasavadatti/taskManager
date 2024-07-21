@@ -12,6 +12,7 @@ import { errorAtom } from "../../../store/Error";
 import { toastAtom } from "../../../store/Toast";
 import { detailsAtom } from "../../../store/Details";
 import { updateAtom } from "../../../store/Update";
+import { unfilteredTasks } from "../../../store/UnfilteredTasks";
 function Card({
   type,
   title,
@@ -33,6 +34,7 @@ function Card({
   const [deleteClicked, setDeleteClicked] = useState(false);
   const setLoading = useSetRecoilState(loadAtom);
   const setTasks = useSetRecoilState(tasksAtom);
+  const setUnfilteredTask = useSetRecoilState(unfilteredTasks);
   const setError = useSetRecoilState(errorAtom);
   const setToast = useSetRecoilState(toastAtom);
   const setDetails = useSetRecoilState(detailsAtom);
@@ -59,6 +61,9 @@ function Card({
         );
         setToast("Task deleted!");
         setTasks((tasks) =>
+          tasks.filter((task: SimpleTaskModal) => task.id != id)
+        );
+        setUnfilteredTask((tasks) =>
           tasks.filter((task: SimpleTaskModal) => task.id != id)
         );
       } catch (e: any) {

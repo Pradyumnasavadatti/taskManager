@@ -10,22 +10,32 @@ import axios from "axios";
 import { unfilteredTasks } from "../../store/UnfilteredTasks";
 import { useDoFilter } from "./container/Filter";
 import Kanban from "../kanban/Kanban";
+import { errorAtom } from "../../store/Error";
 
 function Home() {
   const url = useLocation();
   const [tasks, setTasks] = useRecoilState(tasksAtom);
   const [unfilteredTask, setUnfilteredTasks] = useRecoilState(unfilteredTasks);
+  const setError = useSetRecoilState(errorAtom);
   const filter = useDoFilter();
   useEffect(() => {
-    const fetch = async () => {
-      const headers = { auth: localStorage.getItem(local_storage_token_key) };
-      const response = await axios.get(backend_url + "task/getTasks", {
-        headers,
-      });
-      setUnfilteredTasks(response.data.message.tasks);
-    };
-    if (tasks.length == 0) {
-      fetch();
+    try {
+      const fetch = async () => {
+        const headers = { auth: localStorage.getItem(local_storage_token_key) };
+        const response = await axios.get(backend_url + "task/getTasks", {
+          headers,
+        });
+        setUnfilteredTasks(response.data.message.tasks);
+      };
+      if (tasks.length == 0) {
+        fetch();
+      }
+    } catch (e: any) {
+      if (e.response.status < 500) {
+        setError(e.response.data.message);
+      } else {
+        setError("Something went wrong please try after some time");
+      }
     }
   }, []);
   useEffect(() => {

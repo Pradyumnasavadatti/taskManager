@@ -19,6 +19,14 @@ function Addtask() {
     type: string;
     dueDate: Date | null;
   };
+  type TaskModel2 = {
+    id: Number;
+    title: string;
+    description: string;
+    type: string;
+    dueDate: string;
+    createdAt: string;
+  };
   const titleRef = useRef<HTMLInputElement>(null);
   const descRef = useRef<HTMLTextAreaElement>(null);
   const typeRef = useRef<HTMLSelectElement>(null);
@@ -51,47 +59,62 @@ function Addtask() {
     setTask(taskData);
   }
   useEffect(() => {
-    if (task.title != "") {
-      const headers = {
-        "Content-type": "application/json",
-        auth: localStorage.getItem(local_storage_token_key),
-      };
-      //Just adding some deplay to avoid repated requests withing 1sec
-      let timer = setTimeout(async () => {
-        setLoader(true);
-        const response = await axios.post(
-          backend_url + "task/addTask",
+    try {
+      if (task.title != "") {
+        const headers = {
+          "Content-type": "application/json",
+          auth: localStorage.getItem(local_storage_token_key),
+        };
+        //Just adding some deplay to avoid repated requests withing 1sec
+        let timer = setTimeout(async () => {
+          setLoader(true);
+          const response = await axios.post(
+            backend_url + "task/addTask",
 
-          {
-            task,
-          },
-          { headers }
-        );
-        type newType = TaskModel & { id?: Number };
-        const newTask: newType = task;
-        newTask.id = response.data.message.id;
-        const newTaskArr: any = [];
-        newTaskArr.push(...taskAtom);
-        newTaskArr.push(newTask);
-        setTaskAtom(newTaskArr);
+            {
+              task,
+            },
+            { headers }
+          );
+          let dues: string = "";
+          if (task.dueDate != null) {
+            dues = new Date(task.dueDate).toISOString();
+          }
+          const newTask: TaskModel2 = {
+            ...task,
+            id: response.data.message.id,
+            dueDate: dues,
+            createdAt: new Date().toISOString(),
+          };
+          const newTaskArr: any = [];
+          newTaskArr.push(...taskAtom);
+          newTaskArr.push(newTask);
+          setTaskAtom(newTaskArr);
 
-        const filteredArr = doFilterFn();
-        setFilteredTaskAtom(filteredArr);
-        if (
-          titleRef.current &&
-          descRef.current &&
-          typeRef.current &&
-          dueDateRef.current
-        ) {
-          titleRef.current.value = "";
-          descRef.current.value = "";
-          typeRef.current.value = "";
-          dueDateRef.current.value = "";
-        }
-        setToast("Task added!");
-        setLoader(false);
-      }, 1000);
-      return () => clearTimeout(timer);
+          const filteredArr = doFilterFn();
+          setFilteredTaskAtom(filteredArr);
+          if (
+            titleRef.current &&
+            descRef.current &&
+            typeRef.current &&
+            dueDateRef.current
+          ) {
+            titleRef.current.value = "";
+            descRef.current.value = "";
+            typeRef.current.value = "";
+            dueDateRef.current.value = "";
+          }
+          setToast("Task added!");
+          setLoader(false);
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
+    } catch (e: any) {
+      if (e.response && e.response.status < 500) {
+        setError(e.response.data.message);
+      } else {
+        setError(e.message);
+      }
     }
   }, [task]);
   return (
