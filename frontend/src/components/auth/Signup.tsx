@@ -121,7 +121,6 @@ function Signup() {
     },
   });
   function onSubmit(data: z.infer<typeof zodUser>) {
-    console.log(data);
     onClickHandler();
   }
 

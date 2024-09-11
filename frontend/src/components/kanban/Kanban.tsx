@@ -33,7 +33,6 @@ function Kanban() {
   const [isEmptyTask, setIsEmptyTask] = useState(false);
   const { toast } = useToast();
   const dragHandler: OnDragEndResponder = async (res: DropResult) => {
-    console.log(res);
     if (res.destination?.droppableId == res.source.droppableId) return;
     try {
       setLoader(true);

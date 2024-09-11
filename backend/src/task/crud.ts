@@ -41,7 +41,6 @@ export async function addTask(req: Request, res: Response) {
       },
     });
   } catch (e) {
-    console.log(e);
     failureMessage(res, messages.failure);
   }
 }
@@ -62,12 +61,10 @@ export async function updateTodo(req: Request, res: Response) {
         username: username,
       },
     });
-    console.log(response);
     res.status(200).json({
       message: true,
     });
   } catch (e) {
-    console.log(e);
     failureMessage(res, messages.failure);
   }
 }
@@ -80,12 +77,10 @@ export async function deleteTodo(req: Request, res: Response) {
         id: task.id,
       },
     });
-    console.log(response);
     res.status(200).json({
       message: true,
     });
   } catch (e) {
-    console.log(e);
     failureMessage(res, messages.failure);
   }
 }
@@ -104,14 +99,10 @@ export async function deleteAccount(req: Request, res: Response) {
         username,
       },
     });
-
-    console.log(response1);
-    console.log(response2);
     res.status(200).json({
       message: true,
     });
   } catch (e) {
-    console.log(e);
     failureMessage(res, messages.failure);
   }
 }

@@ -57,7 +57,6 @@ function addTask(req, res) {
             });
         }
         catch (e) {
-            console.log(e);
             (0, crud_1.failureMessage)(res, message_1.messages.failure);
         }
     });
@@ -80,13 +79,11 @@ function updateTodo(req, res) {
                     username: username,
                 },
             });
-            console.log(response);
             res.status(200).json({
                 message: true,
             });
         }
         catch (e) {
-            console.log(e);
             (0, crud_1.failureMessage)(res, message_1.messages.failure);
         }
     });
@@ -101,13 +98,11 @@ function deleteTodo(req, res) {
                     id: task.id,
                 },
             });
-            console.log(response);
             res.status(200).json({
                 message: true,
             });
         }
         catch (e) {
-            console.log(e);
             (0, crud_1.failureMessage)(res, message_1.messages.failure);
         }
     });
@@ -127,14 +122,11 @@ function deleteAccount(req, res) {
                     username,
                 },
             });
-            console.log(response1);
-            console.log(response2);
             res.status(200).json({
                 message: true,
             });
         }
         catch (e) {
-            console.log(e);
             (0, crud_1.failureMessage)(res, message_1.messages.failure);
         }
     });

@@ -62,7 +62,6 @@ function Update() {
         };
         const { success, error } = taskModelWithDateString.safeParse(taskBody);
         if (!success) {
-          console.log(error.issues);
           throw new Error(
             error.issues[0].message + " " + error.issues[0].path[0]
           );
