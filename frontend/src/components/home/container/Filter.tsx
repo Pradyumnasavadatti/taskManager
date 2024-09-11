@@ -40,12 +40,12 @@ function Filter() {
     setSearchKey(searchState);
   }, [searchState]);
   return (
-    <div className="w-full p-4 flex justify-start items-center">
+    <div className="w-full h-fit p-4 flex justify-start items-center flex-wrap">
       <div className="flex flex-col justify-start items-start mr-10">
         <label className="text-sm text-app-theme-400">Filter by date</label>
         <select
           ref={byDateFilter}
-          className="text-app-theme-400 outline-none text-xl p-1 bg-transparent border-b-2 border-app-theme-400"
+          className="text-app-theme-400 outline-none text-md md:text-xl p-1 bg-transparent border-b-2 border-app-theme-400"
           onChange={onChangeByDateHandler}
           value={dateFilter}
         >
@@ -61,7 +61,7 @@ function Filter() {
         <select
           ref={byTypeFilter}
           onChange={onChangeByTypeHandler}
-          className="text-app-theme-400 outline-none text-xl p-1  bg-transparent border-b-2 border-app-theme-400"
+          className="text-app-theme-400 outline-none text-md md:text-xl p-1  bg-transparent border-b-2 border-app-theme-400"
           value={typeFilter}
         >
           <option value="ALL">All</option>
@@ -70,10 +70,10 @@ function Filter() {
           <option value="DONE">Done</option>
         </select>
       </div>
-      <div className="w-[40%] h-full">
+      <div className="w-[70%] md:w-[40%] h-fit my-2">
         <input
           type="text"
-          className="text-app-theme-400 text-xl h-full w-full outline-none border-b-app-theme-400 border-b-2 bg-app-theme-100"
+          className="text-app-theme-400 py-4 text-md md:text-xl h-full w-full outline-none border-b-app-theme-400 border-b-2 bg-app-theme-100"
           placeholder="Enter search key"
           value={searchState}
           onChange={searchKeyHandle}

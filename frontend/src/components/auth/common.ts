@@ -14,14 +14,16 @@ export function useCheckForToken(path: string) {
       const today = new Date().getTime();
       const numberOfDays = Math.abs(today - storedDate) / (24 * 60 * 60 * 1000);
       if (numberOfDays < 30) {
-        decidePath = "/home";
+        if (path == "/signup" || path == "/login") decidePath = "/home";
+        else decidePath = path;
       } else {
-        throw new Error("");
+        if (path == "/signup") decidePath = "/signup";
+        else decidePath = "/login";
       }
     }
   } catch (e) {
-    if (path == "/login" || path == "/home") decidePath = "/login";
-    else decidePath = "/signup";
+    if (path == "/signup") decidePath = "/signup";
+    else decidePath = "/login";
   }
 
   return decidePath;

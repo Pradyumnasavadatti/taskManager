@@ -17,6 +17,8 @@ import { backend_url, local_storage_token_key } from "../../config/creds";
 import { useDoFilter } from "../home/container/Filter";
 import { tasksAtom } from "../../store/Tasks";
 import { toastAtom } from "../../store/Toast";
+import NoTasks from "../../assets/NoTasksCat.png";
+import { useToast } from "../ui/use-toast";
 
 function Kanban() {
   const [unfilteredTask, setUnfilteredTask] = useRecoilState(unfilteredTasks);
@@ -28,6 +30,8 @@ function Kanban() {
   const [done, setDone] = useState<SimpleTaskModal[]>([]);
   const doFilter = useDoFilter();
   const setToast = useSetRecoilState(toastAtom);
+  const [isEmptyTask, setIsEmptyTask] = useState(false);
+  const { toast } = useToast();
   const dragHandler: OnDragEndResponder = async (res: DropResult) => {
     console.log(res);
     if (res.destination?.droppableId == res.source.droppableId) return;
@@ -129,7 +133,10 @@ function Kanban() {
       }
 
       //Show success message
-      setToast("Moved to " + res.destination?.droppableId);
+      toast({
+        description: `Moved to ${res.destination?.droppableId}`,
+        className: "bg-app-theme-400 text-app-theme-100 border-app-theme-200",
+      });
     } catch (e: any) {
       //show failure message
       if (e.response && e.response.status < 500) {
@@ -176,77 +183,89 @@ function Kanban() {
       setTodo(todoArr);
       setInProgress(progressArr);
       setDone(doneArr);
+      setIsEmptyTask(false);
+    } else {
+      setIsEmptyTask(true);
     }
   }, [unfilteredTask]);
 
   return (
-    <div className="flex flex-col justify-start items-start p-2 col-span-4">
-      <h1 className="text-4xl text-app-theme-400">Kanban Board</h1>
+    <div className="flex flex-col justify-start items-start p-2 col-span-4 overflow-y-visible">
+      <h1 className="text-2xl md:text-4xl text-app-theme-400">Kanban Board</h1>
+      <div className="w-[80%] h-[0.3vh]  bg-gradient-to-r from-app-theme-400 to-app-theme-100 mt-1"></div>
       <div className="w-full h-[95%]">
-        <div className="w-full h-full grid gap-2 grid-cols-3">
-          <DragDropContext onDragEnd={dragHandler}>
-            {columns.map((column) => {
-              return (
-                <Droppable droppableId={column.field} key={column.title}>
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      className={`h-full w-full py-2 rounded-xl transition-all ${
-                        snapshot.isDraggingOver ? "bg-[rgba(0,0,0,0.05)]" : ""
-                      }`}
-                    >
-                      <div className="w-full p-4 rounded-xl text-app-theme-400 text-xl text-center">
-                        {column.title}
+        {!isEmptyTask && (
+          <div className="w-full h-full grid gap-2 grid-cols-3">
+            <DragDropContext onDragEnd={dragHandler}>
+              {columns.map((column) => {
+                return (
+                  <Droppable droppableId={column.field} key={column.title}>
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className={`h-full w-full py-2 rounded-xl transition-all ${
+                          snapshot.isDraggingOver ? "bg-[rgba(0,0,0,0.05)]" : ""
+                        }`}
+                      >
+                        <div className="w-full p-4 rounded-xl text-app-theme-400 text-lg md:text-xl text-center">
+                          {column.title}
+                        </div>
+                        {column.tasks.map((task: SimpleTaskModal, index) => {
+                          if (task.type != column.field) return null;
+                          return (
+                            <Draggable
+                              draggableId={
+                                column.field + " " + task.id + " " + index
+                              }
+                              index={index}
+                              key={task.title + " " + index}
+                            >
+                              {(provided, snapshot) => (
+                                <div
+                                  className="w-full h-fit"
+                                  ref={provided.innerRef}
+                                  {...provided.dragHandleProps}
+                                  {...provided.draggableProps}
+                                >
+                                  <Card
+                                    key={task.id.toString() + task.title}
+                                    type={task.type}
+                                    title={task.title}
+                                    description={task.description}
+                                    id={task.id}
+                                    dueDate={
+                                      new Date(task.dueDate)
+                                        .toLocaleString()
+                                        .split(",")[0]
+                                    }
+                                    createdAt={
+                                      new Date(task.createdAt)
+                                        .toLocaleString()
+                                        .split(",")[0]
+                                    }
+                                    index={index}
+                                  />
+                                </div>
+                              )}
+                            </Draggable>
+                          );
+                        })}
+                        {provided.placeholder}
                       </div>
-                      {column.tasks.map((task: SimpleTaskModal, index) => {
-                        if (task.type != column.field) return null;
-                        return (
-                          <Draggable
-                            draggableId={
-                              column.field + " " + task.id + " " + index
-                            }
-                            index={index}
-                            key={task.title + " " + index}
-                          >
-                            {(provided, snapshot) => (
-                              <div
-                                className="w-full h-fit"
-                                ref={provided.innerRef}
-                                {...provided.dragHandleProps}
-                                {...provided.draggableProps}
-                              >
-                                <Card
-                                  key={task.id.toString() + task.title}
-                                  type={task.type}
-                                  title={task.title}
-                                  description={task.description}
-                                  id={task.id}
-                                  dueDate={
-                                    new Date(task.dueDate)
-                                      .toLocaleString()
-                                      .split(",")[0]
-                                  }
-                                  createdAt={
-                                    new Date(task.createdAt)
-                                      .toLocaleString()
-                                      .split(",")[0]
-                                  }
-                                  index={index}
-                                />
-                              </div>
-                            )}
-                          </Draggable>
-                        );
-                      })}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              );
-            })}
-          </DragDropContext>
-        </div>
+                    )}
+                  </Droppable>
+                );
+              })}
+            </DragDropContext>
+          </div>
+        )}
+        {isEmptyTask && (
+          <div className="w-full h-full flex flex-col justify-center items-center">
+            <img src={NoTasks} className="w-[15vmax] h-[15vmax]" />
+            <h2 className="text-3xl text-gray-600">No tasks to display..!</h2>
+          </div>
+        )}
       </div>
     </div>
   );

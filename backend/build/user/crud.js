@@ -22,11 +22,13 @@ let saltRounds = 7;
 const prisma = new client_1.PrismaClient();
 function getUser(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("Got here");
         try {
             const user = req.body;
             const { success } = zod_1.zodUsername.safeParse(user.username);
             if (success) {
                 const result = yield isUserFound(user.username);
+                console.log(result);
                 if (result) {
                     res.status(200).json({
                         //Sending false because user with requested emailId is not found

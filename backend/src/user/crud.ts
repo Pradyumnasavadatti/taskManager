@@ -8,11 +8,13 @@ import jwt from "jsonwebtoken";
 let saltRounds = 7;
 const prisma = new PrismaClient();
 export async function getUser(req: Request, res: Response) {
+  console.log("Got here");
   try {
     const user = req.body;
     const { success } = zodUsername.safeParse(user.username);
     if (success) {
       const result = await isUserFound(user.username);
+      console.log(result);
       if (result) {
         res.status(200).json({
           //Sending false because user with requested emailId is not found

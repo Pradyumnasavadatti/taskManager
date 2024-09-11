@@ -35,7 +35,6 @@ export async function addTask(req: Request, res: Response) {
         username: username,
       },
     });
-    console.log(response);
     res.status(200).json({
       message: {
         id: response.id,

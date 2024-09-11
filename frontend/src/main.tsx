@@ -10,6 +10,7 @@ import Load from "./components/loader/Load.tsx";
 import Toast from "./components/modal/Toast.tsx";
 import Details from "./components/home/container/details/Details.tsx";
 import Update from "./components/home/container/update/Update.tsx";
+import { Toaster } from "./components/ui/toaster.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <RecoilRoot>
@@ -29,5 +30,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <Update />
     <Toast />
     <Load />
+    <Toaster />
   </RecoilRoot>
 );

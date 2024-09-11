@@ -2,8 +2,14 @@ import { z } from "zod";
 
 export const zodUser = z.object({
   username: z.string().email(),
-  password: z.string().min(5).max(15),
-  fullname: z.string().min(3).max(30),
+  password: z
+    .string()
+    .min(5, { message: "Password must be at least 5 characters." })
+    .max(15, { message: "Password must be maximum of 15 characters." }),
+  fullname: z
+    .string()
+    .min(3, { message: "Full Name must be at least 3 characters." })
+    .max(30, { message: "Full Name must be maximum of 15 characters." }),
 });
 export const zodLogin = z.object({
   username: z.string().email(),

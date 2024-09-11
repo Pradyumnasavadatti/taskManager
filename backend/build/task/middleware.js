@@ -23,7 +23,6 @@ function authMiddleware(req, res, next) {
                 throw new Error("");
             }
             let authToken = req.headers["auth"];
-            console.log(req.headers);
             if (authToken) {
                 const decode = jsonwebtoken_1.default.verify(authToken, process.env.JWT_SECRET_KEY);
                 req.body.decode = decode;

@@ -3,7 +3,7 @@ import CloseIcon from "../../../../assets/close.png";
 import { updateAtom } from "../../../../store/Update";
 import { useEffect, useState } from "react";
 import { tasksAtom } from "../../../../store/Tasks";
-import Button from "../../../Button";
+import Button from "../../../CustomButton";
 import { backend_url, local_storage_token_key } from "../../../../config/creds";
 import axios from "axios";
 import { loadAtom } from "../../../../store/Load";
@@ -11,6 +11,7 @@ import { errorAtom } from "../../../../store/Error";
 import { taskModelWithDateString } from "../../../../zod/Zod";
 import { useDoFilter } from "../Filter";
 import { unfilteredTasks } from "../../../../store/UnfilteredTasks";
+import { useToast } from "@/components/ui/use-toast";
 function Update() {
   const [update, setUpdate] = useRecoilState(updateAtom);
   const [tasks, setFilteredTaskAtom] = useRecoilState(tasksAtom);
@@ -19,6 +20,7 @@ function Update() {
   const setError = useSetRecoilState(errorAtom);
   const [task, setTasks] = useRecoilState(unfilteredTasks);
   const doFilterFn = useDoFilter();
+  const { toast } = useToast();
   const closeHandler = () => {
     setUpdate(-1);
   };
@@ -115,6 +117,10 @@ function Update() {
         setTasks(newTaskArr);
         const filteredArr = doFilterFn();
         setFilteredTaskAtom(filteredArr);
+        toast({
+          description: "Task successfully updated!",
+          className: "bg-app-theme-400 text-app-theme-100 border-app-theme-100",
+        });
         setUpdate(-1);
       } catch (e: any) {
         if (e.response && e.response.status < 500) {
@@ -133,9 +139,9 @@ function Update() {
   }, [isUpdate]);
   if (update == -1) return null;
   return (
-    <div className="absolute w-[100vw] h-[100vh] bg-[rgba(0,0,0,0.1)] backdrop-blur-sm left-0 top-0 flex justify-center items-center transition-all ">
+    <div className="fixed w-[100vw] h-[100vh] bg-[rgba(0,0,0,0.1)] backdrop-blur-sm left-0 top-0 flex justify-center items-center transition-all ">
       <div
-        className="w-[50%] h-fit rounded-xl bg-app-theme-400 relative flex justify-start items-start p-4 flex-col"
+        className="w-[90%] md:w-[50%] h-fit rounded-xl bg-app-theme-400 relative flex justify-start items-start p-4 flex-col"
         style={{ boxShadow: "0 5vh 10vmax 5px rgba(0,0,0,1)" }}
       >
         <div className="absolute top-4 right-4">
@@ -146,7 +152,7 @@ function Update() {
             onClick={closeHandler}
           />
         </div>
-        <div className="text-4xl text-app-theme-100 h-fit w-[80%] break-words flex justify-start items-start flex-col">
+        <div className="text-2xl md:text-4xl text-app-theme-100 h-fit w-[80%] break-words flex justify-start items-start flex-col">
           <p className="text-lg">Title</p>
           <input
             type="text"
@@ -160,7 +166,7 @@ function Update() {
           </span>
         </div>
         <div className="h-[0.2vh] w-[70%] bg-app-theme-100"></div>
-        <div className="text-2xl text-app-theme-100 py-4 max-h-[40%] w-full break-words flex flex-col justify-center items-start">
+        <div className="text-lg md:text-2xl text-app-theme-100 py-4 max-h-[40%] w-full break-words flex flex-col justify-center items-start">
           <p className="text-lg">Description</p>
           <textarea
             name="description"
@@ -175,13 +181,13 @@ function Update() {
             Description should be minimum of 10 and maximum of 250 chars
           </span>
         </div>
-        <div className="text-xl text-app-theme-100 py-4 w-full flex flex-col justify-start items-start">
+        <div className="text-sm md:text-xl text-app-theme-100 py-4 w-full flex flex-col justify-start items-start">
           <p className="text-lg">Type</p>
           <select
             value={details.type}
             name="type"
             onChange={changeHandler}
-            className="w-[50%] p-2 text-xl bg-app-theme-100 text-app-theme-400 outline-none border-none rounded-xl"
+            className="w-[50%] p-2 text-sm md:text-xl bg-app-theme-100 text-app-theme-400 outline-none border-none rounded-xl"
           >
             <option value="" disabled>
               Select
@@ -191,13 +197,13 @@ function Update() {
             <option value="DONE">Done</option>
           </select>
         </div>
-        <div className="text-xl text-app-theme-100 py-4">
+        <div className="text-lg md:text-xl text-app-theme-100 py-4">
           <p className="text-lg">Due date</p>
           <span className="p-2  rounded-xl">
             <input
               type="date"
               name="dueDate"
-              className="text-xl p-2 bg-app-theme-100 text-app-theme-400 rounded-xl"
+              className=" text-sm md:text-xl p-2 bg-app-theme-100 text-app-theme-400 rounded-xl"
               min={new Date().toISOString().split("T")[0]}
               value={details.dueDate.split("T")[0]}
               onChange={changeHandler}

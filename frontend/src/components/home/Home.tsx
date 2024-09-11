@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Nav from "./navbar/Nav";
 import Addtask from "../addtask/Addtask";
 import Container from "./container/Container";
@@ -11,6 +11,7 @@ import { unfilteredTasks } from "../../store/UnfilteredTasks";
 import { useDoFilter } from "./container/Filter";
 import Kanban from "../kanban/Kanban";
 import { errorAtom } from "../../store/Error";
+import { useCheckForToken } from "../auth/common";
 
 function Home() {
   const url = useLocation();
@@ -18,17 +19,28 @@ function Home() {
   const [unfilteredTask, setUnfilteredTasks] = useRecoilState(unfilteredTasks);
   const setError = useSetRecoilState(errorAtom);
   const filter = useDoFilter();
+  const navigator = useNavigate();
+  const thisPath = useLocation().pathname;
+  let path = useCheckForToken(thisPath);
+
   useEffect(() => {
     try {
-      const fetch = async () => {
-        const headers = { auth: localStorage.getItem(local_storage_token_key) };
-        const response = await axios.get(backend_url + "task/getTasks", {
-          headers,
-        });
-        setUnfilteredTasks(response.data.message.tasks);
-      };
-      if (tasks.length == 0) {
-        fetch();
+      //Getting thisPath from custome hook which decides wheather to route which component
+      if (thisPath != path) {
+        navigator("/login");
+      } else {
+        const fetch = async () => {
+          const headers = {
+            auth: localStorage.getItem(local_storage_token_key),
+          };
+          const response = await axios.get(backend_url + "task/getTasks", {
+            headers,
+          });
+          setUnfilteredTasks(response.data.message.tasks);
+        };
+        if (tasks.length == 0) {
+          fetch();
+        }
       }
     } catch (e: any) {
       if (e.response.status < 500) {
@@ -45,7 +57,7 @@ function Home() {
 
   if (url.pathname == "/addTask") {
     return (
-      <div className="w-[100vw] h-[100vh] grid grid-cols-5 bg-app-theme-100">
+      <div className="w-[100vw] h-[100vh] md:grid md:grid-cols-5 md:bg-app-theme-100">
         <Nav />
         <Addtask />
       </div>
@@ -54,7 +66,7 @@ function Home() {
 
   if (url.pathname == "/kanban") {
     return (
-      <div className="w-[100vw] h-[100vh] grid grid-cols-5 bg-app-theme-100">
+      <div className="w-[100vw] h-[100vh] md:grid md:grid-cols-5 bg-app-theme-100 overflow-y-visible">
         <Nav />
         <Kanban />
       </div>
@@ -62,7 +74,7 @@ function Home() {
   }
 
   return (
-    <div className="w-[100vw] h-[100vh] grid grid-cols-5 bg-app-theme-100 ">
+    <div className="w-[100vw] h-[100vh] md:grid md:grid-cols-5 bg-app-theme-100 ">
       <Nav />
       <Container />
     </div>

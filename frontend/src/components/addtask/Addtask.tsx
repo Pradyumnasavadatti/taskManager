@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import Button from "../Button";
+import Button from "../CustomButton";
 import Input from "../Input";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { taskModel } from "../../zod/Zod";
@@ -11,6 +11,7 @@ import { loadAtom } from "../../store/Load";
 import { toastAtom } from "../../store/Toast";
 import { unfilteredTasks } from "../../store/UnfilteredTasks";
 import { useDoFilter } from "../home/container/Filter";
+import { useToast } from "../ui/use-toast";
 
 function Addtask() {
   type TaskModel = {
@@ -43,6 +44,7 @@ function Addtask() {
   const setFilteredTaskAtom = useSetRecoilState(tasksAtom);
   const setToast = useSetRecoilState(toastAtom);
   const doFilterFn = useDoFilter();
+  const { toast } = useToast();
 
   async function handleSubmit() {
     const taskData: TaskModel = {
@@ -104,8 +106,13 @@ function Addtask() {
             typeRef.current.value = "";
             dueDateRef.current.value = "";
           }
-          setToast("Task added!");
+          toast({
+            description: "Task Added Successfully!",
+            className:
+              "bg-app-theme-400 text-app-theme-100 border-app-theme-100",
+          });
           setLoader(false);
+          setTask({ title: "", description: "", type: "", dueDate: null });
         }, 1000);
         return () => clearTimeout(timer);
       }
@@ -118,8 +125,10 @@ function Addtask() {
     }
   }, [task]);
   return (
-    <div className="col-span-4 h-[100vh] flex justify-center items-center flex-col bg-app-theme-100">
-      <div className="w-[70%] h-[80%] text-app-theme-400 flex flex-col justify-evenly items-start">
+    <div className="col-span-4 h-[100vh] flex justify-start items-start p-2 flex-col bg-app-theme-100">
+      <h1 className="text-2xl md:text-4xl text-app-theme-400">Add Task</h1>
+      <div className="w-[80%] h-[0.3vh]  bg-gradient-to-r from-app-theme-400 to-app-theme-100 mt-1"></div>
+      <div className="w-[90%] md:w-[70%] h-[80%] text-app-theme-400 flex flex-col justify-evenly items-start p-2">
         <div className="flex flex-col justify-start items-start w-full p-2">
           <Input fieldName="Title" max={100} ref={titleRef} />
           <span className="text-sm text-gray-500">
@@ -127,7 +136,7 @@ function Addtask() {
           </span>
         </div>
 
-        <div className="w-[90%] h-fit p-2 flex flex-col justify-evenly items-start">
+        <div className="w-full md:w-[90%] h-fit p-2 flex flex-col justify-evenly items-start">
           <label className="text-xl">Description</label>
           <textarea
             rows={5}
@@ -143,7 +152,7 @@ function Addtask() {
         </div>
         <div className="w-[90%] h-fit p-2 flex flex-col justify-evenly items-start">
           <label className="text-xl">Type</label>
-          <select className="w-[60%] p-2 text-xl" ref={typeRef}>
+          <select className="w-[60%] p-2 text-xl bg-white" ref={typeRef}>
             <option value="" disabled>
               Select
             </option>
@@ -155,7 +164,7 @@ function Addtask() {
           <label className="text-xl">Due date</label>
           <input
             type="date"
-            className="text-xl p-2"
+            className="text-xl p-2 bg-white"
             min={new Date().toISOString().split("T")[0]}
             ref={dueDateRef}
           />

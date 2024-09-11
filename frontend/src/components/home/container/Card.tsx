@@ -13,6 +13,7 @@ import { toastAtom } from "../../../store/Toast";
 import { detailsAtom } from "../../../store/Details";
 import { updateAtom } from "../../../store/Update";
 import { unfilteredTasks } from "../../../store/UnfilteredTasks";
+import { useToast } from "@/components/ui/use-toast";
 function Card({
   type,
   title,
@@ -39,6 +40,7 @@ function Card({
   const setToast = useSetRecoilState(toastAtom);
   const setDetails = useSetRecoilState(detailsAtom);
   const setUpdate = useSetRecoilState(updateAtom);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function deleteCall() {
@@ -59,7 +61,10 @@ function Card({
             headers,
           }
         );
-        setToast("Task deleted!");
+        toast({
+          description: "Task successfully deleted!",
+          className: "bg-app-theme-400 text-app-theme-100 border-app-theme-100",
+        });
         setTasks((tasks) =>
           tasks.filter((task: SimpleTaskModal) => task.id != id)
         );
@@ -104,43 +109,49 @@ function Card({
 
   return (
     <div
-      className="w-[25vmax] h-fit bg-app-theme-400 rounded-xl flex flex-col justify-evely items-center text-white m-2 p-2 cursor-pointer overflow-hidden"
+      className="w-[28vw] md:w-[25vmax] h-fit bg-app-theme-400 rounded-xl flex flex-col justify-evely items-center text-white m-2 p-2 cursor-pointer overflow-hidden"
       style={{ boxShadow: "0 0 7px 2px rgba(0,0,0,0.5)" }}
     >
-      <div className="w-full p-1 text-lg flex justify-between items-center ">
-        <div className="w-fit text-lg flex justify-start items-center ">
+      <div className="w-full p-1 text-lg flex justify-between items-center">
+        <div className="w-fit flex justify-start items-center text-xs md:text-lg">
           <div
-            className={"w-[0.7vmax] h-[0.7vmax] rounded-full mr-2 " + typeColor}
+            className={
+              "w-[0.5vmax] h-[0.5vmax] md:w-[0.7vmax] md:h-[0.7vmax] rounded-full mr-1 md:mr-2 " +
+              typeColor
+            }
           ></div>
           {type}
         </div>
-        <div className="flex items-center">
+        <div className="md:flex hidden md:flex-row justify-center items-center p-2">
           <img
             src={ResizeIcon}
-            className="w-[2vmax] h-[2vmax]  hover:scale-110  transition-all"
+            className="w-[2vmax] h-[2vmax] md:hover:scale-110  transition-all"
             title="Enlarge"
             onClick={openDetailsHandler}
           />
           {type != "DONE" && (
             <img
               src={EditIcon}
-              className="w-[2vmax] h-[2vmax]  ml-2 hover:scale-110 transition-all"
+              className="w-[2vmax] h-[2vmax] ml-2 md:hover:scale-110 transition-all"
               title="Edit"
               onClick={editHandler}
             />
           )}
           <img
             src={DeleteIcon}
-            className="w-[2vmax] h-[2vmax] ml-2  hover:scale-110  transition-all"
+            className="w-[2vmax] h-[2vmax] ml-2 md:hover:scale-110  transition-all"
             title="Delete"
             onClick={handleDelete}
           />
         </div>
       </div>
-      <div className="w-full p-1 text-2xl">
+      <div className="w-full p-1 text-2xl hidden md:block">
         {title.length > 20 ? title.slice(0, 20) + "..." : title}
       </div>
-      <div className="w-full p-1 text-xl ">
+      <div className="w-full p-1 text-lg block md:hidden">
+        {title.length > 7 ? title.slice(0, 7) + "..." : title}
+      </div>
+      <div className="w-full p-1 text-xl hidden md:block">
         {description.length > 25
           ? description.slice(0, 25) + "..."
           : description}
@@ -153,6 +164,28 @@ function Card({
       {type != "DONE" && (
         <div className="w-full p-1 text-sm">Due by:{" " + dueDate}</div>
       )}
+      <div className="md:hidden flex justify-center items-center p-2">
+        <img
+          src={ResizeIcon}
+          className="w-[3vmax] h-[3vmax] md:hover:scale-110  transition-all"
+          title="Enlarge"
+          onClick={openDetailsHandler}
+        />
+        {type != "DONE" && (
+          <img
+            src={EditIcon}
+            className="w-[3vmax] h-[3vmax] ml-2 md:hover:scale-110 transition-all"
+            title="Edit"
+            onClick={editHandler}
+          />
+        )}
+        <img
+          src={DeleteIcon}
+          className="w-[3vmax] h-[3vmax] ml-2 md:hover:scale-110  transition-all"
+          title="Delete"
+          onClick={handleDelete}
+        />
+      </div>
     </div>
   );
 }

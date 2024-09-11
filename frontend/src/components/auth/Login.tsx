@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import Input from "../Input";
-import Button from "../Button";
+import Logo from "../../assets/logo3.png";
+// import Input from "../Input";
 import Todo from "../../assets/Todo.png";
 import axios, { AxiosResponse } from "axios";
 import {
@@ -14,6 +14,17 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { zodLogin } from "../../zod/Zod";
 import { useCheckForToken } from "./common";
 import { loadAtom } from "../../store/Load";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 function Login() {
   const usernameRef = useRef<HTMLInputElement>(null);
@@ -65,22 +76,56 @@ function Login() {
   }, []);
 
   return (
-    <div className="w-[100vw] h-[100vh] flex justify-between items-center">
-      <div className="w-[50%] h-full flex justify-center items-center bg-app-theme-100">
-        <div className="w-[75%] h-[60%] text-app-theme-400 flex flex-col justify-evenly items-center rounded-xl">
-          <h1 className="font-mono text-4xl">Login to continue!</h1>
-          <Input ref={usernameRef} fieldName="Email" />
-          <Input ref={passwordRef} fieldName="Password" />
-          <Button title="Login" onClickHandler={onClickHandler} />
-          <p className="text-lg">
-            Don't have an account?
-            <Link to="/signup" className="underline">
-              <b>Sign up!</b>
-            </Link>
-          </p>
-        </div>
+    <div className="w-[100vw] h-[100vh] flex justify-center md:justify-between items-center">
+      <div className="w-full md:w-[50%] h-full flex justify-center items-center bg-app-theme-100">
+        <Card className="w-[80%] h-[70%] md:w-[60%] md:h-[50%] relative">
+          <CardHeader>
+            <CardTitle className="text-xl">Login</CardTitle>
+            <CardDescription>Login to continue!</CardDescription>
+          </CardHeader>
+          <CardContent className="h-[65%] flex flex-col justify-evenly">
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                ref={usernameRef}
+                type="email"
+                placeholder="Email"
+                id="email"
+              />
+            </div>
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                ref={passwordRef}
+                type="password"
+                placeholder="Password"
+                id="password"
+              />
+            </div>
+
+            <Button
+              variant={"default"}
+              size={"customSize"}
+              onClick={onClickHandler}
+            >
+              Login
+            </Button>
+          </CardContent>
+          <CardFooter className="flex justify-center items-center">
+            <p className="text-sm font-medium">
+              Don't have an account?
+              <Link to="/signup" className="underline">
+                <b>Sign up!</b>
+              </Link>
+            </p>
+          </CardFooter>
+          <img
+            src={Logo}
+            className="absolute right-2 top-2 w-[10vmax] h-[10vmax] md:w-[5vmax] md:h-[5vmax]"
+          />
+        </Card>
       </div>
-      <div className="w-[50%] h-full flex justify-center items-center relative">
+      <div className="w-[50%] h-full md:flex justify-center items-center relative hidden">
         <img
           src={Todo}
           alt="Loading..."

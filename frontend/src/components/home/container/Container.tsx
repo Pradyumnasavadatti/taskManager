@@ -8,8 +8,8 @@ function Container() {
   const tasks: SimpleTaskModal[] = useRecoilValue(tasksAtom);
   return (
     <div className="flex flex-col justify-evenly items-start overflow-hidden col-span-4 h-full p-2">
-      <h1 className="text-4xl text-app-theme-400">Task List</h1>
-      <div className="w-full h-[0.3vh] bg-app-theme-400"></div>
+      <h1 className="text-2xl md:text-4xl text-app-theme-400">Task List</h1>
+      <div className="w-[80%] h-[0.3vh] bg-gradient-to-r from-app-theme-400 to-app-theme-100"></div>
       <Filter />
       <div className="w-full h-[75%] overflow-hidden">
         <div className="w-full h-full overflow-scroll ">

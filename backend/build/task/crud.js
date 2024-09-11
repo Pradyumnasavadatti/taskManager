@@ -50,7 +50,6 @@ function addTask(req, res) {
                     username: username,
                 },
             });
-            console.log(response);
             res.status(200).json({
                 message: {
                     id: response.id,

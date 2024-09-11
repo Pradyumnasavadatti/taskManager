@@ -1,6 +1,6 @@
 import { MouseEventHandler } from "react";
 
-function Button({
+function CustomButton({
   onClickHandler,
   title,
   disabled = false,
@@ -23,4 +23,4 @@ function Button({
   );
 }
 
-export default Button;
+export default CustomButton;
